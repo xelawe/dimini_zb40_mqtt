@@ -11,7 +11,7 @@ const char* gc_hostname = "d1minizb40";
 void setup() {
   // put your setup code here, to run once:
 
-  cy_serial::start("__FILE__");
+  cy_serial::start(__FILE__);
   wifi_init(gc_hostname);
   delay(500);
 
