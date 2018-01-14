@@ -157,6 +157,7 @@ void callback_mqtt_3(char* topic, byte* payload, unsigned int length) {
 
 void init_zb40() {
 
+
   Serial.print("Init Pins... [ ");
   //set the outputs accordingly
   for (int i = 0; i < 4; i++) {
@@ -165,5 +166,10 @@ void init_zb40() {
     Serial.print(" ");
   }
   Serial.println("]");
+
+  add_subtopic("ATSH28/UG/Z2/GW60/0/set", callback_mqtt_0);
+  add_subtopic("ATSH28/UG/Z2/GW60/1/set", callback_mqtt_1);
+  add_subtopic("ATSH28/UG/Z2/GW60/2/set", callback_mqtt_2);
+  add_subtopic("ATSH28/UG/Z2/GW60/3/set", callback_mqtt_3);
 }
 
