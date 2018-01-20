@@ -28,7 +28,7 @@ void send_ZB40_command(int shutter, int command) {
 
   Serial.print("Sending... [");
   //set the outputs accordingly
-  for (int i = 0; i < 4; i++) {
+  for (int i = 3; i >= 0; i--) {
     digitalWrite(HCS361_PINS[i], HCS361_bits[i]);
     Serial.print(HCS361_bits[i]);
   }
@@ -39,6 +39,7 @@ void send_ZB40_command(int shutter, int command) {
   for (int i = 0; i < 4; i++) {
     digitalWrite(HCS361_PINS[i], LOW);
   }
+  delay(1000);
 }
 
 
