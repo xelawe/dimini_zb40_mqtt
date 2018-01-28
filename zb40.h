@@ -33,8 +33,8 @@ void send_ZB40_command(int shutter, int command) {
     Serial.print(HCS361_bits[i]);
   }
   Serial.println("]");
-  //wait 500ms
-  delay(500);
+  //wait
+  delay(1000);
   //and set them back to 0
   for (int i = 0; i < 4; i++) {
     digitalWrite(HCS361_PINS[i], LOW);
@@ -43,63 +43,63 @@ void send_ZB40_command(int shutter, int command) {
 }
 
 
-void mqtt_callback_zb40(char* topic, byte* payload, unsigned int length) {
-  bool cmd_valid = true;
-  String topic_string = String(topic);
-  String message_string = "";
-
-  Serial.print("Message arrived [");
-  Serial.print(topic);
-  Serial.print("] ");
-  for (int i = 0; i < length; i++) {
-    Serial.print((char)payload[i]);
-    //fill up the message string
-    message_string.concat((char)payload[i]);
-  }
-  Serial.println();
-
-  //we need to find out which command to send
-
-  //find the topic slashes, ignore initial slash
-  int shutter_slash = topic_string.indexOf("/", 1);
-  //cut the shutter string
-  String shutter_string = topic_string.substring(shutter_slash + 1, topic_string.length() - 1);
-  Serial.println(shutter_string.c_str());
-  // map shutter strings
-  int shutter_index = 0;
-  if (shutter_string.equalsIgnoreCase("all")) {
-    shutter_index = SHUTTER_ALL;
-  }
-  else if (shutter_string.equalsIgnoreCase("1") || shutter_string.equalsIgnoreCase("2") || shutter_string.equalsIgnoreCase("3")) {
-    //bit simpler than more else ifs as SUTTER_1 == 1 ...
-    shutter_index = shutter_string.toInt();
-  }
-  else {
-    Serial.print("Received message on unhandled topic: ");
-    Serial.println(topic);
-    cmd_valid = false;
-  }
-  //map commands
-  int shutter_cmd = 0;
-  if (message_string.equalsIgnoreCase("up")) {
-    shutter_cmd = CMD_UP;
-  }
-  else if (message_string.equalsIgnoreCase("down")) {
-    shutter_cmd = CMD_DOWN;
-  }
-  else if (message_string.equalsIgnoreCase("stop")) {
-    shutter_cmd = CMD_STOP;
-  }
-  else {
-    Serial.print("Received illegal command message: ");
-    Serial.println(message_string.c_str());
-    cmd_valid = false;
-  }
-
-  if (cmd_valid) {
-    send_ZB40_command(shutter_index, shutter_cmd);
-  }
-}
+//void mqtt_callback_zb40(char* topic, byte* payload, unsigned int length) {
+//  bool cmd_valid = true;
+//  String topic_string = String(topic);
+//  String message_string = "";
+//
+//  Serial.print("Message arrived [");
+//  Serial.print(topic);
+//  Serial.print("] ");
+//  for (int i = 0; i < length; i++) {
+//    Serial.print((char)payload[i]);
+//    //fill up the message string
+//    message_string.concat((char)payload[i]);
+//  }
+//  Serial.println();
+//
+//  //we need to find out which command to send
+//
+//  //find the topic slashes, ignore initial slash
+//  int shutter_slash = topic_string.indexOf("/", 1);
+//  //cut the shutter string
+//  String shutter_string = topic_string.substring(shutter_slash + 1, topic_string.length() - 1);
+//  Serial.println(shutter_string.c_str());
+//  // map shutter strings
+//  int shutter_index = 0;
+//  if (shutter_string.equalsIgnoreCase("all")) {
+//    shutter_index = SHUTTER_ALL;
+//  }
+//  else if (shutter_string.equalsIgnoreCase("1") || shutter_string.equalsIgnoreCase("2") || shutter_string.equalsIgnoreCase("3")) {
+//    //bit simpler than more else ifs as SUTTER_1 == 1 ...
+//    shutter_index = shutter_string.toInt();
+//  }
+//  else {
+//    Serial.print("Received message on unhandled topic: ");
+//    Serial.println(topic);
+//    cmd_valid = false;
+//  }
+//  //map commands
+//  int shutter_cmd = 0;
+//  if (message_string.equalsIgnoreCase("up")) {
+//    shutter_cmd = CMD_UP;
+//  }
+//  else if (message_string.equalsIgnoreCase("down")) {
+//    shutter_cmd = CMD_DOWN;
+//  }
+//  else if (message_string.equalsIgnoreCase("stop")) {
+//    shutter_cmd = CMD_STOP;
+//  }
+//  else {
+//    Serial.print("Received illegal command message: ");
+//    Serial.println(message_string.c_str());
+//    cmd_valid = false;
+//  }
+//
+//  if (cmd_valid) {
+//    send_ZB40_command(shutter_index, shutter_cmd);
+//  }
+//}
 
 
 void callback_mqtt_index(int shutter_index, byte* payload, unsigned int length) {
@@ -132,45 +132,47 @@ void callback_mqtt_index(int shutter_index, byte* payload, unsigned int length) 
 
   if (cmd_valid) {
     send_ZB40_command(shutter_index, shutter_cmd);
+    // To be sure, send it a second time
+    send_ZB40_command(shutter_index, shutter_cmd);
   }
 
-}
-
-void callback_mqtt_0(char* topic, byte* payload, unsigned int length) {
-  DebugPrintln("Callback 0 - SHUTTER_ALL");
-  callback_mqtt_index(SHUTTER_ALL, payload, length);
-}
-
-void callback_mqtt_1(char* topic, byte* payload, unsigned int length) {
-  DebugPrintln("Callback 1 - SHUTTER_1");
-  callback_mqtt_index(SHUTTER_1, payload, length);
-}
-
-void callback_mqtt_2(char* topic, byte* payload, unsigned int length) {
-  DebugPrintln("Callback 2 - SHUTTER_2");
-  callback_mqtt_index(SHUTTER_2, payload, length);
-}
-
-void callback_mqtt_3(char* topic, byte* payload, unsigned int length) {
-  DebugPrintln("Callback 3 - SHUTTER_3");
-  callback_mqtt_index(SHUTTER_2, payload, length);
-}
-
-void init_zb40() {
-
-
-  Serial.print("Init Pins... [ ");
-  //set the outputs accordingly
-  for (int i = 0; i < 4; i++) {
-    pinMode(HCS361_PINS[i], OUTPUT);
-    Serial.print(HCS361_PINS[i]);
-    Serial.print(" ");
   }
-  Serial.println("]");
 
-  add_subtopic("ATSH28/UG/Z2/GW60/0/set", callback_mqtt_0);
-  add_subtopic("ATSH28/UG/Z2/GW60/1/set", callback_mqtt_1);
-  add_subtopic("ATSH28/UG/Z2/GW60/2/set", callback_mqtt_2);
-  add_subtopic("ATSH28/UG/Z2/GW60/3/set", callback_mqtt_3);
-}
+    void callback_mqtt_0(char* topic, byte* payload, unsigned int length) {
+    DebugPrintln("Callback 0 - SHUTTER_ALL");
+    callback_mqtt_index(SHUTTER_ALL, payload, length);
+  }
+
+    void callback_mqtt_1(char* topic, byte* payload, unsigned int length) {
+    DebugPrintln("Callback 1 - SHUTTER_1");
+    callback_mqtt_index(SHUTTER_1, payload, length);
+  }
+
+    void callback_mqtt_2(char* topic, byte* payload, unsigned int length) {
+    DebugPrintln("Callback 2 - SHUTTER_2");
+    callback_mqtt_index(SHUTTER_2, payload, length);
+  }
+
+    void callback_mqtt_3(char* topic, byte* payload, unsigned int length) {
+    DebugPrintln("Callback 3 - SHUTTER_3");
+    callback_mqtt_index(SHUTTER_2, payload, length);
+  }
+
+    void init_zb40() {
+
+
+    Serial.print("Init Pins... [ ");
+                                 //set the outputs accordingly
+                                 for (int i = 0; i < 4; i++) {
+                                 pinMode(HCS361_PINS[i], OUTPUT);
+                                 Serial.print(HCS361_PINS[i]);
+                                 Serial.print(" ");
+                               }
+                                 Serial.println("]");
+
+    add_subtopic("ATSH28 / UG / Z2 / GW60 / 0 / set", callback_mqtt_0);
+    add_subtopic("ATSH28 / UG / Z2 / GW60 / 1 / set", callback_mqtt_1);
+    add_subtopic("ATSH28 / UG / Z2 / GW60 / 2 / set", callback_mqtt_2);
+    add_subtopic("ATSH28 / UG / Z2 / GW60 / 3 / set", callback_mqtt_3);
+  }
 
