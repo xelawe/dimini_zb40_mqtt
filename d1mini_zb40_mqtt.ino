@@ -4,8 +4,8 @@
 #include "cy_wifi.h"
 #include "cy_ota.h"
 #include "cy_mqtt.h"
-//#include "zb40.h"
-#include "zb40_pca9536.h"
+#include "zb40.h"
+//#include "zb40_pca9536.h"
 
 const char* gc_hostname = "d1mzb40";
 
@@ -21,6 +21,8 @@ void setup() {
   init_zb40();
 
   init_mqtt(gc_hostname);
+
+  Serial.println("done Setup");
 }
 
 void loop() {
@@ -32,4 +34,5 @@ void loop() {
   check_mqtt_reset();
 
   delay(100);
+  //Serial.println("loop");
 }
