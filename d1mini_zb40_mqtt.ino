@@ -4,9 +4,10 @@
 #include "cy_wifi.h"
 #include "cy_ota.h"
 #include "cy_mqtt.h"
-#include "zb40.h"
+//#include "zb40.h"
+#include "zb40_pca9536.h"
 
-const char* gc_hostname = "d1minizb40";
+const char* gc_hostname = "d1mzb40";
 
 void setup() {
   // put your setup code here, to run once:
@@ -16,7 +17,7 @@ void setup() {
   delay(500);
 
   init_ota(gc_hostname);
-  
+
   init_zb40();
 
   init_mqtt(gc_hostname);
@@ -27,7 +28,8 @@ void loop() {
 
   check_ota();
 
-  check_mqtt();
+  //check_mqtt();
+  check_mqtt_reset();
 
   delay(100);
 }

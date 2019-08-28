@@ -1,12 +1,15 @@
-char mqtt_topic[50] = "/ZB40_GATEWAY";
+#include <PCA9536.h>
 
+PCA9536 pca9536; // construct a new PCA9536 instance
+
+//char mqtt_topic[50] = "/ZB40_GATEWAY";
 
 const char* device_name = "ZB40_GATEWAY";
 
 
+//ZB40 config via PCA9536
 
-//ZB40 config
-// pinmapping HCS361 keeloq chip<->ESP node mcu (0,1,2,3)
+// pinmapping HCS361 keeloq chip<->PCA9536 (0,1,2,3)
 const int HCS361_PINS[] = {14, 5, 4, 15}; //  D5, D1, D2, D8 {16, 5, 4, 15};
 const int CMD_UP = 1;
 const int CMD_DOWN = 2;
@@ -19,6 +22,7 @@ const int SHUTTER_3 = 3;
 //ZB40 functions
 void send_ZB40_command(int shutter, int command) {
   int HCS361_bits[4];
+
   //shutter is encoded in the bit 3 and 2
   HCS361_bits[3] = shutter >> 1 & 0x01;
   HCS361_bits[2] = shutter & 0x01;
@@ -26,19 +30,25 @@ void send_ZB40_command(int shutter, int command) {
   HCS361_bits[1] = command >> 1 & 0x01;
   HCS361_bits[0] = command & 0x01;
 
-  Serial.print("Sending... [");
-  //set the outputs accordingly
-  for (int i = 3; i >= 0; i--) {
-    digitalWrite(HCS361_PINS[i], HCS361_bits[i]);
-    Serial.print(HCS361_bits[i]);
-  }
-  Serial.println("]");
+  //  Serial.print("Sending... [");
+  //  //set the outputs accordingly
+  //  for (int i = 3; i >= 0; i--) {
+  //    digitalWrite(HCS361_PINS[i], HCS361_bits[i]);
+  //    Serial.print(HCS361_bits[i]);
+  //  }
+  //  Serial.println("]");
+
+  pca9536.setState((HCS361_bits[0] ? IO_HIGH : IO_LOW), (HCS361_bits[1] ? IO_HIGH : IO_LOW), (HCS361_bits[2] ? IO_HIGH : IO_LOW), (HCS361_bits[3] ? IO_HIGH : IO_LOW));
+
   //wait
   delay(1000);
+
   //and set them back to 0
-  for (int i = 0; i < 4; i++) {
-    digitalWrite(HCS361_PINS[i], LOW);
-  }
+  //  for (int i = 0; i < 4; i++) {
+  //    digitalWrite(HCS361_PINS[i], LOW);
+  //  }
+  pca9536.setState(IO_LOW, IO_LOW, IO_LOW, IO_LOW);
+
   delay(1000);
 }
 
@@ -95,20 +105,22 @@ void callback_mqtt_2(char* topic, byte* payload, unsigned int length) {
 
 void callback_mqtt_3(char* topic, byte* payload, unsigned int length) {
   DebugPrintln("Callback 3 - SHUTTER_3");
-  callback_mqtt_index(SHUTTER_2, payload, length);
+  callback_mqtt_index(SHUTTER_3, payload, length);
 }
 
 void init_zb40() {
+  pca9536.reset(); // make sure device testing starts with default settings
 
-
-  Serial.print("Init Pins... [ ");
-  //set the outputs accordingly
-  for (int i = 0; i < 4; i++) {
-    pinMode(HCS361_PINS[i], OUTPUT);
-    Serial.print(HCS361_PINS[i]);
-    Serial.print(" ");
-  }
-  Serial.println("]");
+  //  Serial.print("Init Pins... [ ");
+  //  //set the outputs accordingly
+  //  for (int i = 0; i < 4; i++) {
+  //    pinMode(HCS361_PINS[i], OUTPUT);
+  //    Serial.print(HCS361_PINS[i]);
+  //    Serial.print(" ");
+  //  }
+  //  Serial.println("]");
+  Serial.print(F("\nSetting all pins as OUTPUT..."));
+  pca9536.setMode(IO_OUTPUT);
 
   add_subtopic("ATSH28/UG/Z2/GW60/0/set", callback_mqtt_0);
   add_subtopic("ATSH28/UG/Z2/GW60/1/set", callback_mqtt_1);
