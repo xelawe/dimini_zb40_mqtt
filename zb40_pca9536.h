@@ -30,23 +30,19 @@ void send_ZB40_command(int shutter, int command) {
   HCS361_bits[1] = command >> 1 & 0x01;
   HCS361_bits[0] = command & 0x01;
 
-  //  Serial.print("Sending... [");
-  //  //set the outputs accordingly
-  //  for (int i = 3; i >= 0; i--) {
-  //    digitalWrite(HCS361_PINS[i], HCS361_bits[i]);
-  //    Serial.print(HCS361_bits[i]);
-  //  }
-  //  Serial.println("]");
-
   pca9536.setState((HCS361_bits[0] ? IO_HIGH : IO_LOW), (HCS361_bits[1] ? IO_HIGH : IO_LOW), (HCS361_bits[2] ? IO_HIGH : IO_LOW), (HCS361_bits[3] ? IO_HIGH : IO_LOW));
+  Serial.print("Sending... [");
+  //set the outputs accordingly
+  for (int i = 3; i >= 0; i--) {
+    //digitalWrite(HCS361_PINS[i], HCS361_bits[i]);
+    Serial.print(HCS361_bits[i]);
+  }
+  Serial.println("]");
 
   //wait
   delay(1000);
 
   //and set them back to 0
-  //  for (int i = 0; i < 4; i++) {
-  //    digitalWrite(HCS361_PINS[i], LOW);
-  //  }
   pca9536.setState(IO_LOW, IO_LOW, IO_LOW, IO_LOW);
 
   delay(1000);
@@ -109,18 +105,31 @@ void callback_mqtt_3(char* topic, byte* payload, unsigned int length) {
 }
 
 void init_zb40() {
+
+  Wire.begin();
+
   pca9536.reset(); // make sure device testing starts with default settings
 
-  //  Serial.print("Init Pins... [ ");
-  //  //set the outputs accordingly
-  //  for (int i = 0; i < 4; i++) {
-  //    pinMode(HCS361_PINS[i], OUTPUT);
-  //    Serial.print(HCS361_PINS[i]);
-  //    Serial.print(" ");
-  //  }
-  //  Serial.println("]");
-  Serial.print(F("\nSetting all pins as OUTPUT..."));
+  pca9536.ping() ? Serial.print(F("PCA9536 Not Found\n")) : Serial.print(F("PCA9536 Found!\n"));
+
+  DebugPrintln(F("\nSetting all pins as OUTPUT..."));
   pca9536.setMode(IO_OUTPUT);
+
+  pca9536.setState(IO_LOW, IO_LOW, IO_LOW, IO_LOW);
+
+  //  while (true) {
+  //    pca9536.setState(IO_HIGH, IO_HIGH, IO_HIGH, IO_HIGH);
+  //    delay(50);
+  //    pca9536.setState(IO_LOW, IO_HIGH, IO_HIGH, IO_HIGH);
+  //    delay(50);
+  //    pca9536.setState(IO_LOW, IO_LOW, IO_HIGH, IO_HIGH);
+  //    delay(50);
+  //    pca9536.setState(IO_LOW, IO_LOW, IO_LOW, IO_HIGH);
+  //    delay(50);
+  //    pca9536.setState(IO_LOW, IO_LOW, IO_LOW, IO_LOW);
+  //    delay(50);
+  //  }
+
 
   add_subtopic("ATSH28/UG/Z2/GW60/0/set", callback_mqtt_0);
   add_subtopic("ATSH28/UG/Z2/GW60/1/set", callback_mqtt_1);
