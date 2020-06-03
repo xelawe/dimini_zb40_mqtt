@@ -2,15 +2,12 @@
 
 PCA9536 pca9536; // construct a new PCA9536 instance
 
-//char mqtt_topic[50] = "/ZB40_GATEWAY";
-
-const char* device_name = "ZB40_GATEWAY";
-
-
 //ZB40 config via PCA9536
 
 // pinmapping HCS361 keeloq chip<->PCA9536 (0,1,2,3)
-const int HCS361_PINS[] = {14, 5, 4, 15}; //  D5, D1, D2, D8 {16, 5, 4, 15};
+//const int HCS361_PINS[] = {14, 5, 4, 15}; //  D5, D1, D2, D8 {16, 5, 4, 15};
+
+
 const int CMD_UP = 1;
 const int CMD_DOWN = 2;
 const int CMD_STOP = 3;
@@ -20,6 +17,7 @@ const int SHUTTER_2 = 2;
 const int SHUTTER_3 = 3;
 
 //ZB40 functions
+
 void send_ZB40_command(int shutter, int command) {
   int HCS361_bits[4];
 
@@ -31,13 +29,14 @@ void send_ZB40_command(int shutter, int command) {
   HCS361_bits[0] = command & 0x01;
 
   pca9536.setState((HCS361_bits[0] ? IO_HIGH : IO_LOW), (HCS361_bits[1] ? IO_HIGH : IO_LOW), (HCS361_bits[2] ? IO_HIGH : IO_LOW), (HCS361_bits[3] ? IO_HIGH : IO_LOW));
-  Serial.print("Sending... [");
+  
+  DebugPrint("Sending... [");
   //set the outputs accordingly
   for (int i = 3; i >= 0; i--) {
     //digitalWrite(HCS361_PINS[i], HCS361_bits[i]);
-    Serial.print(HCS361_bits[i]);
+    DebugPrint(HCS361_bits[i]);
   }
-  Serial.println("]");
+  DebugPrintln("]");
 
   //wait
   delay(1000);
@@ -53,11 +52,11 @@ void callback_mqtt_index(int shutter_index, byte* payload, unsigned int length) 
   String message_string = "";
 
   for (int i = 0; i < length; i++) {
-    Serial.print((char)payload[i]);
+    DebugPrint((char)payload[i]);
     //fill up the message string
     message_string.concat((char)payload[i]);
   }
-  Serial.println();
+  DebugPrintln();
 
   //map payload / commands
   int shutter_cmd = 0;
@@ -71,8 +70,8 @@ void callback_mqtt_index(int shutter_index, byte* payload, unsigned int length) 
     shutter_cmd = CMD_STOP;
   }
   else {
-    Serial.print("Received illegal command message: ");
-    Serial.println(message_string.c_str());
+    DebugPrint("Received illegal command message: ");
+    DebugPrintln(message_string.c_str());
     cmd_valid = false;
   }
 
@@ -127,7 +126,7 @@ void init_zb40() {
   //    pca9536.setState(IO_LOW, IO_LOW, IO_LOW, IO_HIGH);
   //    delay(50);
   //    pca9536.setState(IO_LOW, IO_LOW, IO_LOW, IO_LOW);
-  //    delay(50);
+  //    delay(500);
   //  }
 
 

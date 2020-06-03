@@ -14,7 +14,7 @@ void setup() {
   // put your setup code here, to run once:
 
   cy_serial::start(__FILE__);
-  
+
   wifi_init(gc_hostname);
   delay(500);
 
@@ -36,5 +36,4 @@ void loop() {
   check_mqtt_reset();
 
   delay(100);
-  //Serial.println("loop");
 }
