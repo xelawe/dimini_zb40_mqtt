@@ -8,13 +8,13 @@
 #include "zb40_pca9536.h"
 #include "mqtt_tool.h"
 
-const char* gc_hostname = "d1mzb40";
+//const char* gc_hostname = "d1mzb40";
+const char gc_hostname[] PROGMEM = "d1mzb40";
 
 void setup() {
   cy_serial::start(__FILE__);
 
   init_zb40();
-
   wifi_init(gc_hostname);
   delay(500);
 
@@ -22,7 +22,7 @@ void setup() {
 
   init_mqtt_local( );
 
-  Serial.println("done Setup");
+  Serial.println(F("done Setup"));
 }
 
 void loop() {

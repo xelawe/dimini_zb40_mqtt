@@ -27,10 +27,10 @@ void send_ZB40_command(int shutter, int command) {
   HCS361_bits[1] = command >> 1 & 0x01; 
   HCS361_bits[0] = command & 0x01;
 
-// Ausgabe auf Pins - sind harwaretechnisch vertausch: 1 3 2 4 --> Bits bei Ausgabe vertauschen
+// Ausgabe auf Pins - sind hardwaretechnisch vertausch: 1 3 2 4 --> Bits bei Ausgabe vertauschen
   pca9536.setState((HCS361_bits[0] ? IO_HIGH : IO_LOW), (HCS361_bits[2] ? IO_HIGH : IO_LOW), (HCS361_bits[1] ? IO_HIGH : IO_LOW), (HCS361_bits[3] ? IO_HIGH : IO_LOW));
   
-  DebugPrint("Sending... [");
+  DebugPrint(F("Sending... ["));
   //set the outputs accordingly
   for (int i = 3; i >= 0; i--) {
     //digitalWrite(HCS361_PINS[i], HCS361_bits[i]);
@@ -47,17 +47,15 @@ void send_ZB40_command(int shutter, int command) {
   delay(500);
 }
 
-
-
 void init_zb40() {
 
   Wire.begin();
 
   pca9536.reset(); // make sure device testing starts with default settings
 
-  //pca9536.ping() ? Serial.print(F("PCA9536 Not Found\n")) : Serial.print(F("PCA9536 Found!\n"));
+  pca9536.ping() ? Serial.print(F("PCA9536 Not Found\n")) : Serial.print(F("PCA9536 Found!\n"));
 
-  //DebugPrintln(F("\nSetting all pins as OUTPUT..."));
+  DebugPrintln(F("\nSetting all pins as OUTPUT..."));
   pca9536.setMode(IO_OUTPUT);
 
   pca9536.setState(IO_LOW, IO_LOW, IO_LOW, IO_LOW);
