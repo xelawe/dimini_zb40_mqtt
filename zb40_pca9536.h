@@ -7,13 +7,8 @@ PCA9536 pca9536; // construct a new PCA9536 instance
 // pinmapping HCS361 keeloq chip<->PCA9536 (0,1,2,3)
 //const int HCS361_PINS[] = {14, 5, 4, 15}; //  D5, D1, D2, D8 {16, 5, 4, 15};
 
-const int CMD_UP = 1;
-const int CMD_DOWN = 2;
-const int CMD_STOP = 3;
-const int SHUTTER_ALL = 0;
-const int SHUTTER_1 = 1;
-const int SHUTTER_2 = 2;
-const int SHUTTER_3 = 3;
+enum gt_cmd_i { CMD_NONE, CMD_UP, CMD_DOWN, CMD_STOP };
+enum gt_shutter_i { SHUTTER_ALL, SHUTTER_1, SHUTTER_2, SHUTTER_3 };
 
 //ZB40 functions
 

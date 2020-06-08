@@ -8,8 +8,7 @@
 #include "zb40_pca9536.h"
 #include "mqtt_tool.h"
 
-//const char* gc_hostname = "d1mzb40";
-const char gc_hostname[] PROGMEM = "d1mzb40";
+const char* gc_hostname = "d1mzb40";
 
 void setup() {
   cy_serial::start(__FILE__);

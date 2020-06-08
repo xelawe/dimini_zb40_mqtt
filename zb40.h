@@ -65,7 +65,7 @@ void callback_mqtt_index(int shutter_index, byte* payload, unsigned int length) 
     shutter_cmd = CMD_STOP;
   }
   else {
-    Serial.print("Received illegal command message: ");
+    Serial.print(F"Received illegal command message: ");
     Serial.println(message_string.c_str());
     cmd_valid = false;
   }
