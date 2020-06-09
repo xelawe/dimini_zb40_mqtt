@@ -114,10 +114,10 @@ void init_mqtt_local( ) {
   add_subtopic(mqtt_GetTopic_P(gv_stopic_3, 0, gv_clientname, get_stopic_ix(3)), callback_mqtt_3);
 
 
-  add_subtopic("ATSH28/UG/Z2/GW60/0/set", callback_mqtt_0);
-  add_subtopic("ATSH28/UG/Z2/GW60/1/set", callback_mqtt_1);
-  add_subtopic("ATSH28/UG/Z2/GW60/2/set", callback_mqtt_2);
-  add_subtopic("ATSH28/UG/Z2/GW60/3/set", callback_mqtt_3);
+  //add_subtopic("ATSH28/UG/Z2/GW60/0/set", callback_mqtt_0);
+ // add_subtopic("ATSH28/UG/Z2/GW60/1/set", callback_mqtt_1);
+  //add_subtopic("ATSH28/UG/Z2/GW60/2/set", callback_mqtt_2);
+  //add_subtopic("ATSH28/UG/Z2/GW60/3/set", callback_mqtt_3);
 
 }
 
