@@ -9,18 +9,18 @@ const char gc_stopic_gw60_0[] PROGMEM = "GW60_0";
 const char gc_stopic_gw60_1[] PROGMEM = "GW60_1";
 const char gc_stopic_gw60_2[] PROGMEM = "GW60_2";
 const char gc_stopic_gw60_3[] PROGMEM = "GW60_3";
-// Initialize Table of Strings
 const char* const gt_stopic_gw60[] PROGMEM = { gc_stopic_gw60_0, gc_stopic_gw60_1, gc_stopic_gw60_2, gc_stopic_gw60_3 };
 char gv_sbuffer[7];// buffer for reading the string to (needs to be large enough to take the longest string
 
 char gv_ptopic[MQTT_TOPSZ];
+char gv_pbuffer[5];// buffer for reading the string to (needs to be large enough to take the longest string
+
 const char gc_cmd_none[] PROGMEM = "none";
 const char gc_cmd_up[] PROGMEM = "up";
 const char gc_cmd_down[] PROGMEM = "down";
 const char gc_cmd_stop[] PROGMEM = "stop";
-// Initialize Table of Strings
 const char* const gt_cmd[] PROGMEM = { gc_cmd_none, gc_cmd_up, gc_cmd_down, gc_cmd_stop };
-char gv_pbuffer[5];// buffer for reading the string to (needs to be large enough to take the longest string
+
 
 char *get_stopic_ix( int ix ) {
   strcpy_P(gv_sbuffer, (char*)pgm_read_dword(&(gt_stopic_gw60[ix])));
@@ -34,14 +34,25 @@ char *get_cmd_ix( int ix ) {
   return gv_pbuffer;
 }
 
+void pub_sens(int ldr_val) {
+  char lv_ibuffer[10];
+  //itoa(ldr_val, lv_ibuffer, 4);
+  sprintf_P(lv_ibuffer, (PGM_P)F("%5d"), ldr_val);
+  if (!client.publish(mqtt_GetTopic_P(gv_ptopic, 2, gv_clientname, (PGM_P)F("LDR")), lv_ibuffer, true)) {
+    DebugPrintln(F("pub failed!"));
+  } else {
+    DebugPrintln(F("pub ok!"));
+  }
+}
+
 void pub_stat(int ix, int cmd) {
 
-// bei ix == 0 --> alle auf cmd setzen!
-  
+  // bei ix == 0 --> alle auf cmd setzen!
+
   if (!client.publish(mqtt_GetTopic_P(gv_ptopic, 1, gv_clientname, get_stopic_ix(ix)), get_cmd_ix(cmd), true)) {
-    DebugPrintln("pub failed!");
+    DebugPrintln(F("pub failed!"));
   } else {
-    DebugPrintln("pub ok!");
+    DebugPrintln(F("pub ok!"));
   }
 
 }
@@ -115,7 +126,7 @@ void init_mqtt_local( ) {
 
 
   //add_subtopic("ATSH28/UG/Z2/GW60/0/set", callback_mqtt_0);
- // add_subtopic("ATSH28/UG/Z2/GW60/1/set", callback_mqtt_1);
+  // add_subtopic("ATSH28/UG/Z2/GW60/1/set", callback_mqtt_1);
   //add_subtopic("ATSH28/UG/Z2/GW60/2/set", callback_mqtt_2);
   //add_subtopic("ATSH28/UG/Z2/GW60/3/set", callback_mqtt_3);
 
