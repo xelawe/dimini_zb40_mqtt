@@ -34,12 +34,12 @@ void send_ZB40_command(int shutter, int command) {
   DebugPrintln("]");
 
   //wait
-  delay(100);
+  delay(150);
 
   //and set them back to 0
   pca9536.setState(IO_LOW, IO_LOW, IO_LOW, IO_LOW);
 
-  delay(500);
+  delay(600);
 }
 
 void init_zb40() {
